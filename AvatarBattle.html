@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar RPG Battle</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #game-container, #character-selection, #enemy-selection, #battle-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 350px;
+            display: none;
+        }
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover { background-color: #45a049; }
+        .character-select {
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Tela Inicial do Jogo -->
+    <div id="start-screen">
+        <h1>Avatar RPG Battle</h1>
+        <button class="button" onclick="startGame()">Jogar</button>
+    </div>
+
+    <!-- Tela de Seleção de Personagens -->
+    <div id="game-container">
+        <div id="character-selection">
+            <h2>Escolha seu personagem</h2>
+            <div id="player-characters">
+                <div class="character-select" onclick="selectPlayer('Sonam')" style="background-image: url('sonam.png');">Sonam</div>
+                <div class="character-select" onclick="selectPlayer('Takuya')" style="background-image: url('takuya.png');">Takuya</div>
+                <div class="character-select" onclick="selectPlayer('Taashi')" style="background-image: url('taashi.png');">Taashi</div>
+                <div class="character-select" onclick="selectPlayer('Yoria')" style="background-image: url('yoria.png');">Yoria</div>
+                <div class="character-select" onclick="selectPlayer('Calio')" style="background-image: url('calio.png');">Calio</div>
+                <div class="character-select" onclick="selectPlayer('Meiko')" style="background-image: url('meiko.png');">Meiko</div>
+                <div class="character-select" onclick="selectPlayer('Katsu')" style="background-image: url('katsu.png');">Katsu</div>
+            </div>
+            <button class="button" onclick="nextStep('enemy-selection')">Próximo</button>
+        </div>
+
+        <!-- Tela de Seleção de Inimigo -->
+        <div id="enemy-selection" class="hidden">
+            <h2>Escolha o inimigo</h2>
+            <div id="enemy-characters">
+                <div class="character-select" onclick="selectEnemy('Sonam')" style="background-image: url('sonam.png');">Sonam</div>
+                <div class="character-select" onclick="selectEnemy('Takuya')" style="background-image: url('takuya.png');">Takuya</div>
+                <div class="character-select" onclick="selectEnemy('Taashi')" style="background-image: url('taashi.png');">Taashi</div>
+                <div class="character-select" onclick="selectEnemy('Yoria')" style="background-image: url('yoria.png');">Yoria</div>
+                <div class="character-select" onclick="selectEnemy('Calio')" style="background-image: url('calio.png');">Calio</div>
+                <div class="character-select" onclick="selectEnemy('Meiko')" style="background-image: url('meiko.png');">Meiko</div>
+                <div class="character-select" onclick="selectEnemy('Katsu')" style="background-image: url('katsu.png');">Katsu</div>
+            </div>
+            <button class="button" onclick="startBattle()">Iniciar Batalha</button>
+        </div>
+
+        <!-- Tela de Batalha -->
+        <div id="battle-container" class="hidden">
+            <h2>Batalha entre <span id="player-name"></span> e <span id="enemy-name"></span></h2>
+            <div id="battle-status"></div>
+            <button class="button" onclick="attack()">Atacar!</button>
+        </div>
+    </div>
+
+    <script>
+        let playerCharacter = null;
+        let enemyCharacter = null;
+        let playerHealth = 100;
+        let enemyHealth = 100;
+
+        // Função para mostrar o menu inicial
+        function startGame() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('game-container').style.display = 'block';
+            document.getElementById('character-selection').style.display = 'block';
+        }
+
+        // Função para selecionar o personagem do jogador
+        function selectPlayer(character) {
+            playerCharacter = character;
+            alert('Você escolheu ' + character + ' como seu personagem!');
+        }
+
+        // Função para ir para a tela de seleção de inimigo
+        function nextStep(nextScreenId) {
+            if (playerCharacter) {
+                document.getElementById('character-selection').style.display = 'none';
+                document.getElementById(nextScreenId).style.display = 'block';
+            } else {
+                alert('Por favor, escolha um personagem!');
+            }
+        }
+
+        // Função para selecionar o inimigo
+        function selectEnemy(character) {
+            if (character !== playerCharacter) {
+                enemyCharacter = character;
+                alert('Você escolheu ' + character + ' como inimigo!');
+            } else {
+                alert('O inimigo não pode ser o mesmo que o seu personagem!');
+            }
+        }
+
+        // Função para iniciar a batalha
+        function startBattle() {
+            if (enemyCharacter) {
+                document.getElementById('enemy-selection').style.display = 'none';
+                document.getElementById('battle-container').style.display = 'block';
+                document.getElementById('player-name').textContent = playerCharacter;
+                document.getElementById('enemy-name').textContent = enemyCharacter;
+                updateBattleStatus();
+            } else {
+                alert('Escolha um inimigo para começar a batalha!');
+            }
+        }
+
+        // Função para realizar um ataque
+        function attack() {
+            if (Math.random() > 0.5) {
+                enemyHealth -= 20;
+                alert(playerCharacter + ' atacou e causou 20 de dano!');
+            } else {
+                playerHealth -= 20;
+                alert(enemyCharacter + ' atacou e causou 20 de dano!');
+            }
+            updateBattleStatus();
+            checkBattleStatus();
+        }
+
+        // Atualiza o status da batalha
+        function updateBattleStatus() {
+            document.getElementById('battle-status').innerHTML = `
+                <p><strong>${playerCharacter}</strong>: Vida = ${playerHealth}</p>
+                <p><strong>${enemyCharacter}</strong>: Vida = ${enemyHealth}</p>
+            `;
+        }
+
+        // Verifica o status da batalha
+        function checkBattleStatus() {
+            if (playerHealth <= 0) {
+                alert(playerCharacter + ' perdeu a batalha!');
+                resetGame();
+            } else if (enemyHealth <= 0) {
+                alert(enemyCharacter + ' perdeu a batalha!');
+                resetGame();
+            }
+        }
+
+        // Reinicia o jogo
+        function resetGame() {
+            playerCharacter = null;
+            enemyCharacter = null;
+            playerHealth = 100;
+            enemyHealth = 100;
+            document.getElementById('battle-container').style.display = 'none';
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'block';
+        }
+    </script>
+
+</body>
+</html>
